@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 
+from sklearn.metrics import recall_score, precision_score, accuracy_score, make_scorer, confusion_matrix, average_precision_score, roc_auc_score
+
 # http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
@@ -42,3 +44,31 @@ def plot_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.show()
+
+
+def classify(X_train, X_test, y_train, y_test, classifier, random_state=0, normalized=True):
+    
+    clf = classifier()
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    auprc = average_precision_score(y_test, y_pred)
+    auroc = roc_auc_score(y_test, y_pred)
+    
+    print("Mean accuracy: {}".format(accuracy))
+    print("Mean precision: {}".format(precision))
+    print("Mean recall: {}".format(recall))
+    print("AUPRC: {}".format(auprc))
+    print("AUROC: {}".format(auroc))
+    
+    cm = confusion_matrix(y_true=y_test, y_pred=y_pred)
+    plot_confusion_matrix(cm=cm, classes=['Not fraud', 'Fraud'], normalize=normalized)
+    
+    return {'accuracy': accuracy, 
+            'precision': precision,
+            'recall': recall,
+            'AUPRC': auprc,
+            'AUROC': auroc}
