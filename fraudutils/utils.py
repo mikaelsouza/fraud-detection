@@ -72,3 +72,31 @@ def classify(X_train, X_test, y_train, y_test, classifier, random_state=0, norma
             'recall': recall,
             'AUPRC': auprc,
             'AUROC': auroc}
+
+def stratified_crossvalidation(classifier, X, y, cv, scoring):
+    from sklearn.model_selection import StratifiedKFold
+    from collections import defaultdict
+    from statistics import mean
+    
+    X = np.array(X)
+    y = np.array(y)
+    
+    sfk = StratifiedKFold(cv)
+    results = defaultdict(list)
+    
+    for train_index, test_index in sfk.split(X, y):
+        
+        X_train = X[train_index]
+        X_test = X[test_index]
+        y_train = y[train_index]
+        y_test = y[test_index]
+        
+        classifier.fit(X_train, y_train)
+        
+        for score_name, score_function in scoring.items():
+            results[score_name].append(score_function(classifier, X_test, y_test))
+    
+    for score_name, score_results in results.items():
+        results[score_name] = mean(score_results)
+    
+    return dict(results)
