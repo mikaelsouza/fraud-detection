@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import itertools
 
 from sklearn.metrics import recall_score, precision_score, accuracy_score, make_scorer, confusion_matrix, average_precision_score, roc_auc_score
+from pprint import pprint
 
 # http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
 def plot_confusion_matrix(cm, classes,
@@ -73,7 +74,7 @@ def classify(X_train, X_test, y_train, y_test, classifier, random_state=0, norma
             'AUPRC': auprc,
             'AUROC': auroc}
 
-def stratified_crossvalidation(classifier, X, y, cv, scoring):
+def stratified_crossvalidation(classifier, X, y, cv, scoring, normalized=False):
     from sklearn.model_selection import StratifiedKFold
     from collections import defaultdict
     from statistics import mean
@@ -84,6 +85,9 @@ def stratified_crossvalidation(classifier, X, y, cv, scoring):
     sfk = StratifiedKFold(cv)
     results = defaultdict(list)
     
+    general_y_pred = []
+    general_y_real = []
+
     for train_index, test_index in sfk.split(X, y):
         
         X_train = X[train_index]
@@ -91,12 +95,23 @@ def stratified_crossvalidation(classifier, X, y, cv, scoring):
         y_train = y[train_index]
         y_test = y[test_index]
         
-        classifier.fit(X_train, y_train)
+        clf = classifier()
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+
+        general_y_pred.extend(y_pred)
+        general_y_real.extend(y_test)
         
         for score_name, score_function in scoring.items():
-            results[score_name].append(score_function(classifier, X_test, y_test))
+            results[score_name].append(score_function(clf, X_test, y_test))
     
     for score_name, score_results in results.items():
         results[score_name] = mean(score_results)
     
-    return dict(results)
+    cm = confusion_matrix(y_true=general_y_real, y_pred=general_y_pred)
+    plot_confusion_matrix(cm=cm, classes=['Not fraud', 'Fraud'], normalize=normalized)
+
+    results = dict(results)
+    pprint(results)
+
+    return results
