@@ -49,7 +49,7 @@ def plot_confusion_matrix(cm, classes,
 
 def classify(X_train, X_test, y_train, y_test, classifier, random_state=0, normalized=True):
     
-    clf = classifier()
+    clf = classifier
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
     
@@ -95,7 +95,7 @@ def stratified_crossvalidation(classifier, X, y, cv, scoring, normalized=False):
         y_train = y[train_index]
         y_test = y[test_index]
         
-        clf = classifier()
+        clf = classifier
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
 
