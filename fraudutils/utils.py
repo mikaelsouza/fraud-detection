@@ -1,9 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 import itertools
 
 from sklearn.metrics import recall_score, precision_score, accuracy_score, make_scorer, confusion_matrix, average_precision_score, roc_auc_score
 from pprint import pprint
+
+def load_train_test_val_dataset(path, files=['train_df.csv', 'test_df.csv', 'val_df.csv']):
+    data = []
+
+    for file_name in files:
+        df = pd.read_csv(path + file_name)
+        data.append(df)
+    return data
 
 # http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
 def plot_confusion_matrix(cm, classes,
