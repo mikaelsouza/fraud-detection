@@ -1,3 +1,4 @@
 data/raw/kaggle/creditcard.csv filter=lfs diff=lfs merge=lfs -text
 data/processed/give-me-some-credit/. filter=lfs diff=lfs merge=lfs -text
 data/. filter=lfs diff=lfs merge=lfs -text
+models/bagan-autoencoder filter=lfs diff=lfs merge=lfs -text
